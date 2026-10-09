@@ -21,7 +21,9 @@ The service binds to the Mac's network interfaces so a separate Home Assistant h
 
 ## Home Assistant sensors
 
-Copy `custom_components/world_model` into the Home Assistant configuration directory's `custom_components` folder, restart Home Assistant, then add **Home World Model** from Settings > Devices & Services. Use the server URL and bridge token shown under the dashboard's settings. The integration polls the read-only endpoint and creates status, activity, next-action, action-score, and event-count sensors.
+For a HACS custom-repository install, make this GitHub repository public, then add its URL in HACS > Integrations > menu > Custom repositories as an **Integration**. Download **Home World Model**, restart Home Assistant, then add it from Settings > Devices & Services. Use the server URL and bridge token shown under the dashboard's settings. HACS installs only the integration; the model server must remain running on the Mac.
+
+Alternatively, copy `custom_components/world_model` into the Home Assistant configuration directory's `custom_components` folder and restart. The integration polls the server's read-only endpoint and creates status, activity, next-action, action-score, and event-count sensors.
 
 ## Model boundaries
 

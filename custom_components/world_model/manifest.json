@@ -1,9 +1,10 @@
 {
   "domain": "world_model",
   "name": "Home World Model",
-  "codeowners": [],
+  "codeowners": ["@Omid-Mirzaee-Yazdi"],
   "config_flow": true,
-  "documentation": "https://www.home-assistant.io/integrations/",
+  "documentation": "https://github.com/Omid-Mirzaee-Yazdi/HA_transformer#home-assistant-sensors",
+  "issue_tracker": "https://github.com/Omid-Mirzaee-Yazdi/HA_transformer/issues",
   "iot_class": "local_polling",
   "version": "0.1.0"
 }
