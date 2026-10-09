@@ -1,0 +1,9 @@
+fastapi
+httpx
+certifi
+numpy
+pandas
+scikit-learn
+torch
+uvicorn[standard]
+websockets

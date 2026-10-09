@@ -1,0 +1,20 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect Home World Model",
+        "description": "Enter the local server URL and the bridge token shown in its dashboard.",
+        "data": {
+          "url": "World Model server URL",
+          "bridge_token": "Bridge token"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect or the bridge token was rejected."
+    },
+    "abort": {
+      "already_configured": "This World Model server is already configured."
+    }
+  }
+}

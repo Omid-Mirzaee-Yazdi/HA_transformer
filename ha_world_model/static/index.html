@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Home World Model</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="wordmark" href="/" aria-label="Home World Model">H<span>·</span>W</a>
+    <div class="topbar-title">
+      <span class="eyebrow">LOCAL INTELLIGENCE / HOME ASSISTANT</span>
+      <h1>World model</h1>
+    </div>
+    <div class="topbar-status">
+      <span id="connection-dot" class="status-dot"></span>
+      <span id="connection-label">Starting</span>
+      <span class="divider"></span>
+      <span id="model-label">Model training</span>
+    </div>
+    <button id="settings-toggle" class="icon-button" type="button" aria-label="Open settings" title="Settings">
+      <span aria-hidden="true">&#9881;</span>
+    </button>
+  </header>
+
+  <main>
+    <section id="setup-panel" class="setup-panel" hidden>
+      <div class="setup-copy">
+        <span class="eyebrow">CONNECT YOUR HOME</span>
+        <h2>Bring the live house into view.</h2>
+        <p>Enter your Home Assistant address and a long-lived access token. The token is stored locally with owner-only file permissions. HTTPS certificate verification remains enabled.</p>
+      </div>
+      <form id="connection-form" class="connection-form">
+        <label>Home Assistant URL
+          <input name="ha_url" type="url" value="http://homeassistant.local:8123" required placeholder="http://homeassistant.local:8123">
+        </label>
+        <label>IANA timezone
+          <input name="timezone" type="text" required>
+        </label>
+        <label class="wide-field">Long-lived access token
+          <input name="access_token" type="password" autocomplete="new-password" required minlength="20">
+        </label>
+        <label class="wide-field">Optional HTTPS CA certificate path
+          <input name="ca_cert_path" type="text" autocomplete="off" placeholder="/Users/you/certs/home-assistant-ca.pem">
+          <span class="field-hint">Only needed when Home Assistant uses a private certificate authority.</span>
+        </label>
+        <button class="primary-button" type="submit">Save and connect <span aria-hidden="true">&#8594;</span></button>
+        <p id="setup-error" class="form-error" role="alert"></p>
+      </form>
+    </section>
+
+    <section id="settings-panel" class="settings-panel" hidden>
+      <div>
+        <span class="eyebrow">HOME ASSISTANT ENTITY BRIDGE</span>
+        <h2>Publish model sensors</h2>
+        <p>Install <code>custom_components/world_model</code> in your Home Assistant config, restart HA, then add the World Model integration.</p>
+        <button id="edit-connection" class="quiet-button" type="button">Edit Home Assistant connection</button>
+      </div>
+      <div class="bridge-details">
+        <label>Server URL for Home Assistant
+          <input id="bridge-url" type="text" readonly>
+        </label>
+        <label>Bridge token
+          <div class="copy-field"><input id="bridge-token" type="password" readonly><button id="reveal-token" type="button">Show</button><button id="copy-token" type="button">Copy</button></div>
+        </label>
+      </div>
+    </section>
+
+    <section class="overview-strip" aria-label="System summary">
+      <div class="overview-cell">
+        <span class="eyebrow">EVENTS SEEN</span>
+        <strong id="event-count">0</strong>
+        <span id="last-event" class="muted">Waiting for Home Assistant</span>
+      </div>
+      <div class="overview-cell">
+        <span class="eyebrow">MODEL DEVICE</span>
+        <strong id="model-device">--</strong>
+        <span id="model-samples" class="muted">Training history</span>
+      </div>
+      <div class="overview-cell">
+        <span class="eyebrow">CONTEXT WINDOW</span>
+        <strong>60 <small>minutes</small></strong>
+        <span id="warmup-state" class="muted">Collecting live context</span>
+      </div>
+      <div class="overview-cell overview-action">
+        <span class="eyebrow">NEXT 15 MINUTES</span>
+        <strong id="action-risk">--</strong>
+        <span class="muted">Model action score <span class="help" title="Uncalibrated ranking score, not a probability">i</span></span>
+      </div>
+    </section>
+
+    <section class="primary-grid">
+      <div class="main-column">
+        <section class="section-block context-section">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">LIVE STATE ESTIMATE</span>
+              <h2>What the model sees</h2>
+            </div>
+            <span id="inference-time" class="muted">No live inference yet</span>
+          </div>
+          <div class="activity-line">
+            <span class="activity-mark" aria-hidden="true"></span>
+            <p id="activity-summary">Waiting for current Home Assistant states.</p>
+          </div>
+        </section>
+
+        <section class="section-block candidate-section">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">RANKED BY SEQUENCE MODEL</span>
+              <h2>Possible next actions</h2>
+            </div>
+            <span class="muted">Suggestions only</span>
+          </div>
+          <div id="candidate-list" class="candidate-list">
+            <p class="empty-state">The model will rank candidates after it has a full hour of live context.</p>
+          </div>
+          <p class="caveat">Scores are uncalibrated rankings. The model never runs these actions.</p>
+        </section>
+
+        <section class="section-block event-section">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">HA EVENT BUS</span>
+              <h2>Recent activity</h2>
+            </div>
+            <span id="event-types" class="event-types"></span>
+          </div>
+          <div class="event-table-wrap">
+            <table>
+              <thead><tr><th>Time</th><th>Event</th><th>Entity / service</th><th>State</th></tr></thead>
+              <tbody id="event-list"><tr><td colspan="4" class="muted">No events received yet.</td></tr></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <aside class="side-column">
+        <section class="section-block model-section">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">MODEL STATUS</span>
+              <h2 id="model-state-title">Loading</h2>
+            </div>
+            <span id="model-status-mark" class="model-mark">···</span>
+          </div>
+          <div class="model-meter"><span id="model-meter-fill"></span></div>
+          <div class="model-meta"><span>Training rows</span><strong id="model-row-count">--</strong></div>
+          <div class="model-meta"><span>Features</span><strong id="model-feature-count">--</strong></div>
+          <button id="retrain-button" class="quiet-button" type="button">Retrain from recorder</button>
+          <p id="model-error" class="form-error" role="alert"></p>
+        </section>
+
+        <section class="section-block event-summary-section">
+          <span class="eyebrow">EVENT MIX</span>
+          <h2>What is flowing</h2>
+          <div id="event-mix" class="event-mix"><span class="muted">No event types yet</span></div>
+        </section>
+
+        <section class="section-block boundary-section">
+          <span class="boundary-symbol" aria-hidden="true">&#8594;</span>
+          <h2>Read-only by design</h2>
+          <p>The server listens to Home Assistant and publishes model state. It has no code path for calling device services.</p>
+        </section>
+      </aside>
+    </section>
+  </main>
+  <footer><span>WORLD MODEL / LOCAL PROCESS</span><span id="footer-timezone">UTC</span></footer>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+"""Local Home Assistant world-model service."""

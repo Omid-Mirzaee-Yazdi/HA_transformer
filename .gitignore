@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.DS_Store
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+/home-assistant_v2.db*
+/data/*
+!/data/README.md
